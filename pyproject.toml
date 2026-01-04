@@ -1,0 +1,11 @@
+[project]
+name="src"
+version="0.0.1"
+description="manager "
+authors=[{name="pratap singh",email="pratapsingh202004@gmail.com"}]
+
+[tools.setuptools]
+packages={ind={}}
+
+[tools.setuptools.dynamic]
+dependencies={file="requirments.txt"}
