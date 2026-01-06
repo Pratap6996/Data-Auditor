@@ -10,8 +10,13 @@ app/api/profile.py
 app/constants/__init__.py
 app/constants/values.py
 app/core/__init__.py
+app/core/drift/Drifter.py
 app/core/drift/__init__.py
+app/core/drift/boolean_drift.py
+app/core/drift/categorical_drift.py
 app/core/drift/detector.py
+app/core/drift/drift_dispatcher.py
+app/core/drift/statistical_drift.py
 app/core/ingestion/__init__.py
 app/core/ingestion/loader.py
 app/core/profiling/__init__.py
@@ -21,6 +26,7 @@ app/core/profiling/numeric.py
 app/core/profiling/profiler.py
 app/core/storage/__init__.py
 app/core/utils/__init__.py
+app/core/utils/snapshot.py
 app/core/utils/type_detection.py
 app/from_root/__init__.py
 app/from_root/root.py

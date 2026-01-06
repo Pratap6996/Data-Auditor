@@ -3,24 +3,54 @@ from app.Exception import MyException
 import sys
 
 class CategoricalProfiler:
-    def profile(self, series: pd.Series) -> dict:
+    def profile(self, series: pd.Series, top_k: int = 5) -> dict:
         """
-        Profile categorical column: unique count, top value, top frequency, missing %
+        Profile categorical column and emit FLAT drift-ready signals
         """
         try:
             metrics = {}
-            metrics["count"] = int(series.count())
-            metrics["missing_percentage"] = float(series.isna().mean() * 100)
-            metrics["unique_count"] = int(series.nunique(dropna=True))
 
-            if series.dropna().empty:
-                metrics["top"] = None
-                metrics["top_frequency"] = None
+            # ---------- Basic ----------
+            total_count = len(series)
+            non_null_count = series.count()
+
+            metrics["count"] = int(non_null_count)
+            metrics["missing_percentage"] = float(round(
+                (total_count - non_null_count) / total_count * 100, 2
+            ))
+
+            clean_series = series.dropna()
+            metrics["unique_count"] = int(clean_series.nunique())
+
+            # ---------- Cardinality bucket ----------
+            if metrics["unique_count"] <= 10:
+                metrics["cardinality_type"] = "low"
+            elif metrics["unique_count"] <= 100:
+                metrics["cardinality_type"] = "mid"
             else:
-                top_value = series.mode().iloc[0]
-                metrics["top"] = top_value
-                metrics["top_frequency"] = (series == top_value).sum()
-            
+                metrics["cardinality_type"] = "high"
+
+            # ---------- Empty column ----------
+            if clean_series.empty:
+                metrics["top_category"] = None
+                metrics["top_category_percentage"] = 0.0
+                metrics["other_percentage"] = 0.0
+                return metrics
+
+            # ---------- Top category ----------
+            value_counts = clean_series.value_counts(normalize=True)
+            top_category = value_counts.idxmax()
+            top_pct = value_counts.iloc[0] * 100
+
+            metrics["top_category"] = str(top_category)
+            metrics["top_category_percentage"] = float(round(top_pct, 2))
+
+            # ---------- Other bucket ----------
+            metrics["other_percentage"] =float(round(
+                (1 - value_counts.iloc[0]) * 100, 2
+            ))
+
             return metrics
+
         except Exception as e:
             raise MyException(e, sys)

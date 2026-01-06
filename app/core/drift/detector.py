@@ -28,27 +28,4 @@ class SchemaValidator:
             "semantic_type_changes": type_changes
         }
     
-    def detect_numeric_drift(prev_metrics, curr_metrics, threshold=0.05):
-        drift = {}
-
-        for col in prev_metrics:
-            if col not in curr_metrics:
-                continue
-
-            prev_mean = prev_metrics[col]["mean"]
-            curr_mean = curr_metrics[col]["mean"]
-
-            if prev_mean == 0:
-                continue
-
-            relative_change = abs(curr_mean - prev_mean) / prev_mean
-
-            if relative_change > threshold:
-                drift[col] = {
-                    "prev_mean": prev_mean,
-                    "curr_mean": curr_mean,
-                    "change_ratio": round(relative_change, 3)
-                }
-
-        return drift
-
+    
